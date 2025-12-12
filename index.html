@@ -116,7 +116,7 @@
 <div class="main-row">
   <!-- STÂNGA: relație, pași, câmpuri -->
   <div class="left-pane">
-    <p><strong>1. Introduce relația din problemă:</strong></p>
+    <p><strong>1. Introdu relația din problemă:</strong></p>
 
     <input id="relInitiala" type="text"
            value="[(x:4+5):6+10]:10+3=13"
@@ -126,10 +126,10 @@
 
     <hr>
 
-<p><strong>2.  Rezolvă problema : </strong><br>
-– În caseta liberă notează <strong>operația inversă</strong> ultimului pas din problemă.<br>
-– Modifică partea stângă și partea dreaptă a relației, astfel încât să obții pasul următor.<br>
-Apoi apasă <strong>„Înregistrează pasul”</strong>.</p>
+    <p><strong>2.  Rezolvă problema : </strong><br>
+    – În caseta liberă notează <strong>operația inversă</strong> ultimului pas din problemă.<br>
+    – Modifică partea stângă și partea dreaptă a relației, astfel încât să obții pasul următor.<br>
+    Apoi apasă <strong>„Înregistrează pasul”</strong>.</p>
 
     <div class="row">
       <div class="col">
@@ -159,47 +159,269 @@ Apoi apasă <strong>„Înregistrează pasul”</strong>.</p>
 
   <!-- DREAPTA: tastatura -->
   <div class="right-pane">
-<div id="keyboard">
-  <h3>Tastatură</h3>
-  <div class="kb-grid">
+    <div id="keyboard">
+      <h3>Tastatură</h3>
+      <div class="kb-grid">
 
-    <!-- rând 1 -->
-    <button type="button" class="kb-btn" onclick="insertPair('(',')')">( )</button>
-    <button type="button" class="kb-btn" onclick="insertPair('[',']')">[ ]</button>
-    <button type="button" class="kb-btn" onclick="insertPair('{','}')">{ }</button>
-    <button type="button" class="kb-btn" onclick="insertChar(':')">:</button>
+        <!-- rând 1 -->
+        <button type="button" class="kb-btn" onclick="insertPair('(',')')">( )</button>
+        <button type="button" class="kb-btn" onclick="insertPair('[',']')">[ ]</button>
+        <button type="button" class="kb-btn" onclick="insertPair('{','}')">{ }</button>
+        <button type="button" class="kb-btn" onclick="insertChar(':')">:</button>
 
-    <!-- rând 2 -->
-    <button type="button" class="kb-btn" onclick="insertChar('7')">7</button>
-    <button type="button" class="kb-btn" onclick="insertChar('8')">8</button>
-    <button type="button" class="kb-btn" onclick="insertChar('9')">9</button>
-    <button type="button" class="kb-btn" onclick="insertChar('×')">•</button>
+        <!-- rând 2 -->
+        <button type="button" class="kb-btn" onclick="insertChar('7')">7</button>
+        <button type="button" class="kb-btn" onclick="insertChar('8')">8</button>
+        <button type="button" class="kb-btn" onclick="insertChar('9')">9</button>
+        <button type="button" class="kb-btn" onclick="insertChar('×')">•</button>
 
-    <!-- rând 3 -->
-    <button type="button" class="kb-btn" onclick="insertChar('4')">4</button>
-    <button type="button" class="kb-btn" onclick="insertChar('5')">5</button>
-    <button type="button" class="kb-btn" onclick="insertChar('6')">6</button>
-    <button type="button" class="kb-btn" onclick="insertChar('-')">−</button>
+        <!-- rând 3 -->
+        <button type="button" class="kb-btn" onclick="insertChar('4')">4</button>
+        <button type="button" class="kb-btn" onclick="insertChar('5')">5</button>
+        <button type="button" class="kb-btn" onclick="insertChar('6')">6</button>
+        <button type="button" class="kb-btn" onclick="insertChar('-')">−</button>
 
-    <!-- rând 4 -->
-    <button type="button" class="kb-btn" onclick="insertChar('1')">1</button>
-    <button type="button" class="kb-btn" onclick="insertChar('2')">2</button>
-    <button type="button" class="kb-btn" onclick="insertChar('3')">3</button>
-    <button type="button" class="kb-btn" onclick="insertChar('+')">+</button>
+        <!-- rând 4 -->
+        <button type="button" class="kb-btn" onclick="insertChar('1')">1</button>
+        <button type="button" class="kb-btn" onclick="insertChar('2')">2</button>
+        <button type="button" class="kb-btn" onclick="insertChar('3')">3</button>
+        <button type="button" class="kb-btn" onclick="insertChar('+')">+</button>
 
-    <!-- rând 5 MODIFICAT -->
-    <button type="button" class="kb-btn kb-wide" onclick="insertChar('x')">x</button>
-    <button type="button" class="kb-btn" onclick="insertChar('0')">0</button>
-    <button type="button" class="kb-btn kb-wide" onclick="backspace()">șterge</button>
-    <button type="button" class="kb-btn kb-equal" onclick="insertChar('=')">=</button>
+        <!-- rând 5 -->
+        <button type="button" class="kb-btn kb-wide" onclick="insertChar('x')">x</button>
+        <button type="button" class="kb-btn" onclick="insertChar('0')">0</button>
+        <button type="button" class="kb-btn kb-wide" onclick="backspace()">șterge</button>
+        <button type="button" class="kb-btn kb-equal" onclick="insertChar('=')">=</button>
 
-  </div>
-</div>
+      </div>
+    </div>
   </div>
 </div>
 
 <script>
-  // --- gestionare pași (fără verificare matematică) ---
+  // ================= UTILITĂȚI PENTRU VERIFICARE =================
+
+  // verifică dacă parantezele () [] {} sunt echilibrate
+  function parantezeEchilibrate(s) {
+    const stack = [];
+    const pairs = {')': '(', ']': '[', '}': '{'};
+    for (const ch of s) {
+      if (ch === '(' || ch === '[' || ch === '{') {
+        stack.push(ch);
+      } else if (ch === ')' || ch === ']' || ch === '}') {
+        if (!stack.length || stack[stack.length - 1] !== pairs[ch]) return false;
+        stack.pop();
+      }
+    }
+    return stack.length === 0;
+  }
+
+  // normalizează expresia pentru comparație (fără spații, fără paranteze exterioare inutile)
+  function normalizeExpr(str) {
+    let s = str.replace(/\s+/g, '');
+    // eliminăm paranteze exterioare care cuprind TOT șirul, dacă sunt corect închise
+    let changed = true;
+    const pairs = [
+      ['(', ')'],
+      ['[', ']'],
+      ['{', '}']
+    ];
+    while (changed && s.length >= 2) {
+      changed = false;
+      for (const [o, c] of pairs) {
+        if (s[0] === o && s[s.length - 1] === c) {
+          let depth = 0;
+          let ok = true;
+          for (let i = 0; i < s.length; i++) {
+            const ch = s[i];
+            if (ch === o) depth++;
+            else if (ch === c) {
+              depth--;
+              if (depth === 0 && i < s.length - 1) {
+                ok = false;
+                break;
+              }
+            }
+          }
+          if (ok && depth === 0) {
+            s = s.slice(1, -1);
+            changed = true;
+          }
+        }
+      }
+    }
+    return s;
+  }
+
+  // identifică ultima operație (+, -, :, ×) la nivel de suprafață în partea stângă
+  // întoarce { op, base, tail } sau null
+  function getLastOperation(expr) {
+    const s = expr.trim();
+    let depthP = 0, depthB = 0, depthC = 0;
+    for (let i = s.length - 1; i >= 0; i--) {
+      const ch = s[i];
+      if (ch === ')') depthP++;
+      else if (ch === '(') depthP--;
+      else if (ch === ']') depthB++;
+      else if (ch === '[') depthB--;
+      else if (ch === '}') depthC++;
+      else if (ch === '{') depthC--;
+      else if (depthP === 0 && depthB === 0 && depthC === 0 &&
+              (ch === '+' || ch === '-' || ch === ':' || ch === '×')) {
+        const base = s.slice(0, i).trim();
+        const tail = s.slice(i + 1).trim();
+        if (!base || !tail) return null;
+        return { op: ch, base, tail };
+      }
+    }
+    return null;
+  }
+
+  // evaluează o expresie NUMERICĂ (fără x), cu +, -, :, ×, paranteze
+  function evalNumeric(expr) {
+    if (/[a-zA-Z]/.test(expr)) {
+      throw new Error("Expresia conține litere.");
+    }
+    let s = expr.replace(/\s+/g, '');
+    s = s.replace(/×/g, '*').replace(/•/g, '*').replace(/:/g, '/');
+    s = s.replace(/\[/g, '(').replace(/\]/g, ')')
+         .replace(/\{/g, '(').replace(/\}/g, ')');
+
+    if (!s) throw new Error("Expresie goală.");
+
+    // permitem doar cifre, + - * / . și paranteze
+    if (!/^[0-9+\-*/().]+$/.test(s)) {
+      throw new Error("Caractere nepermise în expresie.");
+    }
+
+    // folosim Function în loc de eval
+    return Function('"use strict";return (' + s + ')')();
+  }
+
+  // verifică relația inițială
+  function verificaRelInitiala(left, right) {
+    if (!left || !right) {
+      return { ok: false, msg: "Scrie o relație de forma expresie_cu_x = număr." };
+    }
+    if (!left.includes('x')) {
+      return { ok: false, msg: "Partea stângă trebuie să conțină necunoscuta x." };
+    }
+    if (/[a-zA-Z]/.test(right)) {
+      return { ok: false, msg: "Partea dreaptă trebuie să fie doar numerică (fără litere)." };
+    }
+    if (!parantezeEchilibrate(left) || !parantezeEchilibrate(right)) {
+      return { ok: false, msg: "Parantezele nu sunt închise corect." };
+    }
+    const info = getLastOperation(left);
+    if (!info) {
+      return {
+        ok: false,
+        msg: "Nu pot identifica ultima operație din partea stângă.\nAsigură-te că există o operație (+, −, :, ×) la nivel de suprafață."
+      };
+    }
+    try {
+      evalNumeric(right);
+    } catch (e) {
+      return {
+        ok: false,
+        msg: "Partea dreaptă trebuie să fie un număr sau o expresie numerică validă."
+      };
+    }
+    return { ok: true };
+  }
+
+  // verifică dacă pasul nou este corect față de pasul anterior
+  function verificaPas(oldLeft, oldRight, newLeft, newRight) {
+    if (!newLeft || !newRight) {
+      return { ok: false, msg: "Completează atât partea stângă, cât și partea dreaptă." };
+    }
+
+    if (!parantezeEchilibrate(newLeft) || !parantezeEchilibrate(newRight)) {
+      return { ok: false, msg: "Parantezele din noul pas nu sunt închise corect." };
+    }
+
+    const normOldLeft = normalizeExpr(oldLeft);
+    if (normOldLeft === 'x') {
+      return {
+        ok: false,
+        msg: "Ai ajuns deja la x.\nNu mai avem ce operație inversă să aplicăm."
+      };
+    }
+
+    if (!newLeft.includes('x')) {
+      return { ok: false, msg: "În partea stângă trebuie să apară necunoscuta x." };
+    }
+    if (/[a-zA-Z]/.test(newRight)) {
+      return { ok: false, msg: "În partea dreaptă nu trebuie să apară litere, doar numere și operații." };
+    }
+
+    const info = getLastOperation(oldLeft);
+    if (!info) {
+      return {
+        ok: false,
+        msg: "Nu pot identifica ultima operație din pasul precedent."
+      };
+    }
+
+    // verificăm partea stângă: trebuie să fie exact baza, după ce „ștergem” ultima operație
+    const normBase = normalizeExpr(info.base);
+    const normNewLeft = normalizeExpr(newLeft);
+    if (normBase !== normNewLeft) {
+      return {
+        ok: false,
+        msg: "Partea stângă nu este obținută corect.\nTrebuie să „anulezi” ultima operație din pasul precedent."
+      };
+    }
+
+    // construim expresia numerică așteptată pe dreapta, aplicând operația inversă
+    const tail = info.tail;
+    let expectedRightExpr;
+    switch (info.op) {
+      case '+': // invers: - tail
+        expectedRightExpr = "(" + oldRight + ")-(" + tail + ")";
+        break;
+      case '-': // invers: + tail
+        expectedRightExpr = "(" + oldRight + ")+(" + tail + ")";
+        break;
+      case ':': // împărțire – invers: × tail
+        expectedRightExpr = "(" + oldRight + ")×(" + tail + ")";
+        break;
+      case '×': // înmulțire – invers: : tail
+        expectedRightExpr = "(" + oldRight + "):(" + tail + ")";
+        break;
+      default:
+        return { ok: false, msg: "Operație necunoscută: " + info.op };
+    }
+
+    let vAsteptat, vElev;
+    try {
+      vAsteptat = evalNumeric(expectedRightExpr);
+    } catch (e) {
+      return {
+        ok: false,
+        msg: "Nu pot interpreta partea dreaptă a pasului precedent.\nVerifică dacă este o expresie numerică validă."
+      };
+    }
+    try {
+      vElev = evalNumeric(newRight);
+    } catch (e) {
+      return {
+        ok: false,
+        msg: "Partea dreaptă nouă nu este o expresie numerică validă."
+      };
+    }
+
+    if (Math.abs(vAsteptat - vElev) > 1e-9) {
+      return {
+        ok: false,
+        msg: "Partea dreaptă nu corespunde operației inverse.\nAr fi trebuit să obții ceva echivalent cu: " + expectedRightExpr
+      };
+    }
+
+    return { ok: true };
+  }
+
+  // ================== GESTIONARE PAȘI ====================
 
   // fiecare pas: { left, right, expl }
   let pasi = [];
@@ -240,6 +462,12 @@ Apoi apasă <strong>„Înregistrează pasul”</strong>.</p>
     const rel = document.getElementById("relInitiala").value;
     const parts = spargeRelatia(rel);
 
+    const check = verificaRelInitiala(parts.left, parts.right);
+    if (!check.ok) {
+      alert(check.msg);
+      return;
+    }
+
     stangaInitiala = parts.left;
     dreaptaInitiala = parts.right;
 
@@ -263,6 +491,14 @@ Apoi apasă <strong>„Înregistrează pasul”</strong>.</p>
     const leftCurent = document.getElementById("stanga").value.trim();
     const rightCurent = document.getElementById("dreapta").value.trim();
     const explAnterior = document.getElementById("explicatie").value.trim();
+
+    const pasAnterior = pasi[indexCurent];
+
+    const check = verificaPas(pasAnterior.left, pasAnterior.right, leftCurent, rightCurent);
+    if (!check.ok) {
+      alert(check.msg);
+      return; // NU înregistrăm pasul dacă este greșit
+    }
 
     if (explAnterior !== "") {
       pasi[indexCurent].expl = explAnterior;
@@ -296,7 +532,7 @@ Apoi apasă <strong>„Înregistrează pasul”</strong>.</p>
     afiseazaPasi();
   }
 
-  // --- tastatură virtuală ---
+  // ================= TASTATURA VIRTUALĂ =================
 
   let activeFieldId = "stanga";
 
@@ -325,7 +561,6 @@ Apoi apasă <strong>„Înregistrează pasul”</strong>.</p>
     const before = el.value.slice(0, start);
     const inside = el.value.slice(start, end);
     const after  = el.value.slice(end);
-    // dacă există selecție, o încadrăm; altfel, punem cursorul între paranteze
     const newText = before + open + inside + close + after;
     el.value = newText;
     const pos = inside ? start + open.length + inside.length
